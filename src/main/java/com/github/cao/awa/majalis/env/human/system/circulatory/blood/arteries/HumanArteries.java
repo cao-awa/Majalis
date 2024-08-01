@@ -2,8 +2,7 @@ package com.github.cao.awa.majalis.env.human.system.circulatory.blood.arteries;
 
 import com.github.cao.awa.apricot.util.collection.ApricotCollectionFactor;
 import com.github.cao.awa.majalis.env.human.Human;
-import com.github.cao.awa.majalis.env.human.organ.heart.heartbeat.wave.qrs.QRSWaveMetadata;
-import com.github.cao.awa.majalis.env.human.system.circulatory.HumanCirculatorySystem;
+import com.github.cao.awa.majalis.env.human.organ.heart.heartbeat.wave.qt.qrs.QRSWaveMetadata;
 import com.github.cao.awa.majalis.env.human.system.circulatory.blood.HumanVascular;
 import org.jetbrains.annotations.Nullable;
 

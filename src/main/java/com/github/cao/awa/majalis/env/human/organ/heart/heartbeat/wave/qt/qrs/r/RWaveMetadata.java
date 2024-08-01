@@ -1,4 +1,4 @@
-package com.github.cao.awa.majalis.env.human.organ.heart.heartbeat.wave.qrs.r;
+package com.github.cao.awa.majalis.env.human.organ.heart.heartbeat.wave.qt.qrs.r;
 
 import com.github.cao.awa.majalis.env.human.organ.heart.heartbeat.wave.WaveMetadata;
 import com.github.cao.awa.majalis.env.human.organ.heart.heartbeat.wave.WaveType;

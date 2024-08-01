@@ -1,11 +1,9 @@
 package com.github.cao.awa.majalis.env.human.organ.heart;
 
-import com.github.cao.awa.majalis.config.MajalisConfigs;
 import com.github.cao.awa.majalis.env.human.Human;
 import com.github.cao.awa.majalis.env.human.organ.heart.heartbeat.HeartbeatTrigger;
 import com.github.cao.awa.majalis.env.human.organ.heart.heartbeat.wave.WaveMetadata;
-import com.github.cao.awa.majalis.env.human.organ.heart.heartbeat.wave.qrs.QRSWaveMetadata;
-import com.github.cao.awa.majalis.env.human.system.circulatory.HumanCirculatorySystem;
+import com.github.cao.awa.majalis.env.human.organ.heart.heartbeat.wave.qt.qrs.QRSWaveMetadata;
 import com.github.cao.awa.majalis.env.human.system.circulatory.blood.arteries.HumanArteries;
 import com.github.cao.awa.majalis.env.human.organ.HumanOrgan;
 import com.github.cao.awa.majalis.env.human.system.circulatory.blood.veins.HumanVeins;
@@ -17,12 +15,10 @@ public class HumanHeart extends HumanOrgan {
     private final HumanVeins veins;
     private WaveMetadata state;
     private WaveMetadata subState;
-    private int expectedWaiting = 400;
-    // ms
-    private int qrsBlood = 30;
-    private int waiting = 400;
-    private int leftOutput = 90000;
-    private int pumpTicks = 40;
+    private int pumpInRightAtria;
+    private int pumpInRightVentricle;
+    private int pumpInLeftAtria;
+    private int pumpInLeftVentricle;
 
     public HumanHeart(Human humanBelong, HumanArteries arteries, HumanVeins veins) {
         this.human = humanBelong;
@@ -38,7 +34,8 @@ public class HumanHeart extends HumanOrgan {
 
         }).pSubscribe(p -> {
 
-        }).qrsMetaProcessor(qrs ->{
+        }).qrsMetaProcessor(qrs -> {
+            qrs.backlogOutput(this.arteries.pumpInputMax());
             qrs.peakedOutput(90000);
             this.state = qrs;
             this.arteries.pumpInputMax(qrs.peakedOutput());
@@ -68,6 +65,8 @@ public class HumanHeart extends HumanOrgan {
 
     @Override
     public void tickBlood() {
+        this.trigger.finished(HeartbeatTrigger::resetHeartbeat);
+
         this.trigger.tick();
 
         this.arteries.tick();

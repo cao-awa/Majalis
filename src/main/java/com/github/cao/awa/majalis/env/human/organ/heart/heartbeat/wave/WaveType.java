@@ -10,7 +10,8 @@ public enum WaveType {
     T,
     U,
 
-    PR,
+    PR_INTERVAL,
+    PR_SEGMENT,
     QT,
     ST,
 }

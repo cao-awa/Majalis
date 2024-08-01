@@ -1,4 +1,4 @@
-package com.github.cao.awa.majalis.env.human.organ.heart.heartbeat.wave.qrs.s;
+package com.github.cao.awa.majalis.env.human.organ.heart.heartbeat.wave.qt.qrs.q;
 
 import com.github.cao.awa.majalis.env.human.organ.heart.heartbeat.wave.WaveMetadata;
 import com.github.cao.awa.majalis.env.human.organ.heart.heartbeat.wave.WaveType;
@@ -10,7 +10,7 @@ import lombok.experimental.Accessors;
 @Getter
 @Setter
 @Accessors(fluent = true)
-public class SWaveMetadata extends WaveMetadata {
+public class QWaveMetadata extends WaveMetadata {
     private WaveRenderShape renderShape = WaveRenderShape.INVERTED;
 
     @Override
@@ -20,6 +20,6 @@ public class SWaveMetadata extends WaveMetadata {
 
     @Override
     public WaveType type() {
-        return WaveType.S;
+        return WaveType.Q;
     }
 }

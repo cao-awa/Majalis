@@ -1,8 +1,8 @@
 plugins {
     id 'java'
     id "com.github.ben-manes.versions" version '+'
-    id 'org.jetbrains.kotlin.jvm' version '2.0.0-RC2'
-    id 'org.jetbrains.kotlin.plugin.lombok' version '2.0.0-RC2'
+    id 'org.jetbrains.kotlin.jvm' version '2.0.20-RC'
+    id 'org.jetbrains.kotlin.plugin.lombok' version '2.0.20-RC'
     id 'io.freefair.lombok' version '8.6'
 }
 
@@ -38,19 +38,19 @@ dependencies {
     testImplementation platform('org.junit:junit-bom:5.9.1')
     testImplementation 'org.junit.jupiter:junit-jupiter'
 
-    compileOnly 'org.projectlombok:lombok:1.18.32'
-    annotationProcessor 'org.projectlombok:lombok:1.18.32'
+    compileOnly 'org.projectlombok:lombok:1.18.34'
+    annotationProcessor 'org.projectlombok:lombok:1.18.34'
 
     shadow 'org.slf4j:slf4j-api:2.1.0-alpha1'
     shadow 'org.apache.logging.log4j:log4j-slf4j2-impl:2.23.1'
     shadow 'org.apache.logging.log4j:log4j-api:2.23.1'
     shadow 'org.apache.logging.log4j:log4j-core:2.23.1'
-    shadow 'commons-codec:commons-codec:1.17.0'
-    shadow 'commons-logging:commons-logging:1.3.1'
+    shadow 'commons-codec:commons-codec:1.17.1'
+    shadow 'commons-logging:commons-logging:1.3.3'
     shadow 'commons-io:commons-io:2.16.1'
-    shadow 'it.unimi.dsi:fastutil:8.5.13'
+    shadow 'it.unimi.dsi:fastutil:8.5.14'
     shadow 'com.google.guava:guava:33.1.0-jre'
-    shadow 'com.github.oshi:oshi-core:6.6.0'
+    shadow 'com.github.oshi:oshi-core:6.6.2'
     shadow 'io.github.pcmind:leveldb:1.2'
     shadow 'org.jetbrains:annotations:24.1.0'
 
