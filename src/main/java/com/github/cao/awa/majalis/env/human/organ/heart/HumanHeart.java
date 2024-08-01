@@ -2,6 +2,9 @@ package com.github.cao.awa.majalis.env.human.organ.heart;
 
 import com.github.cao.awa.majalis.config.MajalisConfigs;
 import com.github.cao.awa.majalis.env.human.Human;
+import com.github.cao.awa.majalis.env.human.organ.heart.heartbeat.HeartbeatTrigger;
+import com.github.cao.awa.majalis.env.human.organ.heart.heartbeat.wave.WaveMetadata;
+import com.github.cao.awa.majalis.env.human.organ.heart.heartbeat.wave.qrs.QRSWaveMetadata;
 import com.github.cao.awa.majalis.env.human.system.circulatory.HumanCirculatorySystem;
 import com.github.cao.awa.majalis.env.human.system.circulatory.blood.arteries.HumanArteries;
 import com.github.cao.awa.majalis.env.human.organ.HumanOrgan;
@@ -9,75 +12,67 @@ import com.github.cao.awa.majalis.env.human.system.circulatory.blood.veins.Human
 
 public class HumanHeart extends HumanOrgan {
     private final Human human;
-    private final HumanCirculatorySystem circulatorySystem;
+    private final HeartbeatTrigger trigger;
     private final HumanArteries arteries;
     private final HumanVeins veins;
+    private WaveMetadata state;
+    private WaveMetadata subState;
+    private int expectedWaiting = 400;
     // ms
     private int qrsBlood = 30;
-    private int waiting = 300;
+    private int waiting = 400;
     private int leftOutput = 90000;
     private int pumpTicks = 40;
 
-    public HumanHeart(Human humanBelong, HumanCirculatorySystem circulatorySystem, HumanArteries arteries, HumanVeins veins) {
+    public HumanHeart(Human humanBelong, HumanArteries arteries, HumanVeins veins) {
         this.human = humanBelong;
-        this.circulatorySystem = circulatorySystem;
         this.arteries = arteries;
         this.veins = veins;
+        this.trigger = new HeartbeatTrigger(this, this.arteries);
+
+        initHeartSubscribers();
+    }
+
+    private void initHeartSubscribers() {
+        this.trigger.pMetaProcessor(p -> {
+
+        }).pSubscribe(p -> {
+
+        }).qrsMetaProcessor(qrs ->{
+            qrs.peakedOutput(90000);
+            this.state = qrs;
+            this.arteries.pumpInputMax(qrs.peakedOutput());
+        }).qrsForward((qrs, p) -> {
+            qrs.peakedTime(p.endTime() + 60);
+        }).qrsSubscribe(qrs -> {
+
+        }).qMetaProcessor(q -> {
+
+        }).qForward((q, qrs) -> {
+
+        }).qSubscribe(q -> {
+            this.subState = q;
+        });
     }
 
     @Override
     public void tick() {
-        System.out.println(arteries().bloodPressure());
-
         tickBlood();
+
+        if (this.state != null && this.state instanceof QRSWaveMetadata qrs) {
+            System.out.println(this.arteries.bloodPressure(this.trigger.times(), qrs));
+        } else {
+            System.out.println(this.arteries.bloodPressure(-1, null));
+        }
     }
 
     @Override
     public void tickBlood() {
-        tickLeftVentricle();
-    }
+        this.trigger.tick();
 
-    private void tickLeftVentricle() {
         this.arteries.tick();
+
         this.veins.tick();
-
-        if (this.waiting > 0 && this.qrsBlood < 1) {
-            this.waiting -= MajalisConfigs.expectedTickTime;
-
-            if (this.waiting > 280 && this.waiting < 295) {
-                pumpBlood();
-            } else {
-                this.leftOutput = 15000;
-                this.pumpTicks = 15;
-            }
-            return;
-        } else {
-            this.waiting = 400;
-        }
-
-        if (this.qrsBlood < 1) {
-            this.qrsBlood = 40;
-            this.pumpTicks = 40;
-            System.out.println("- Reset heart beat");
-            this.leftOutput = 90000;
-        }
-
-        this.qrsBlood -= MajalisConfigs.expectedTickTime;
-
-        pumpBlood();
-    }
-
-    public void pumpBlood() {
-        if (this.leftOutput > 0 && this.pumpTicks > 0) {
-            int output = this.leftOutput / this.pumpTicks;
-            this.arteries.cardiacOutput(output);
-            this.leftOutput -= output;
-            this.pumpTicks -= MajalisConfigs.expectedTickTime;
-        }
-    }
-
-    public int bloodPressure() {
-        return this.arteries.bloodPressure();
     }
 
     @Override

@@ -10,6 +10,11 @@ public class Human implements Tickable {
 
     public Human(int initVolemia) {
         this.circulatory = new HumanCirculatorySystem(this, initVolemia);
+        this.circulatory.initBloodCells();
+    }
+
+    public HumanCirculatorySystem circulatorySystem() {
+        return this.circulatory;
     }
 
     @Override

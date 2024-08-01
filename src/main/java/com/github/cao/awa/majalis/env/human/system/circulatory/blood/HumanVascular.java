@@ -1,73 +1,51 @@
 package com.github.cao.awa.majalis.env.human.system.circulatory.blood;
 
 import com.github.cao.awa.majalis.config.MajalisConfigs;
+import com.github.cao.awa.majalis.env.human.Human;
 import com.github.cao.awa.majalis.env.human.system.HumanSystem;
+import com.github.cao.awa.majalis.env.human.system.circulatory.blood.cell.SystemBloodCell;
 
 public abstract class HumanVascular extends HumanSystem {
-
+    private final Human human;
     // Cardiac output(when arteries) or vascular output(when veins), unit is μL/time.
-    private int bloodInput = 0;
-    // Blood volume or volemia, unit is mL.
-    private int volemia;
+    private int pumpInputMax = 0;
     private int expectedShrinkage;
     private int expectedElasticity;
     // Shrinkage pressure or peripheral resistance, unit is mmHg/(μL/time).
     private int shrinkage;
     // Vascular elasticity or vascular compliance, unit is μL/mmHg.
     private int elasticity;
-    private int pumpTicks = 0;
 
-    public HumanVascular(int initVolemia, int expectedShrinkage, int expectedElasticity) {
-        this.volemia = initVolemia;
+    public HumanVascular(Human human, int expectedShrinkage, int expectedElasticity) {
+        this.human = human;
         this.expectedShrinkage = expectedShrinkage;
         this.expectedElasticity = expectedElasticity;
         this.shrinkage = expectedShrinkage;
         this.elasticity = expectedElasticity;
     }
 
-    /**
-     * <p>
-     * Blood pressure calculate method:
-     * <blockquote><pre>
-     *  P = R(<sup><sup>CO</sup>&frasl<sub>e<sup>V</sup></sub></sup>&frasl<sub>C</sub>(1-e<sup>-RC</sup>))
-     *
-     * </pre></blockquote><p>
-     * Where P is blood pressure, CO is cardiac output.
-     * <p>
-     * Where R is peripheral resistant, C is vascular compliance.
-     *
-     * @author 草
-     * @author 草二号机
-     *
-     * @since 1.0.0
-     *
-     * @return The blood pressure united by mmHg
-     */
-    public int bloodPressure() {
-        // Compliance also known as ’C’ unit is mL.
-        double compliance = this.elasticity / 1000D;
-        // Resistant also known as ’R’ unit is mL.
-        double resistant = this.shrinkage / 1000D;
-        // Input also known as ’CO’ unit is mL.
-        double input = this.bloodInput / 1000D;
-        // Volemia also known as ’V’ unit is mL.
-        double volemia = this.volemia;
-        double offset = 1 - Math.exp(- (resistant * compliance));
-        double volemiaOffset =  (1 - Math.exp(-resistant));
-        double basePressure = volemia * volemiaOffset * (1 - Math.exp(- resistant)) / 3.896695;
-        double pumpOffset = 1 - Math.exp(-compliance);
-        double pumpPressure = ((input * pumpOffset) * offset) / 1.896695;
-
-        return (int) (
-                basePressure + pumpPressure
-        );
+    public int elasticity() {
+        return this.elasticity;
     }
 
-    public void cardiacOutput(int input) {
-        this.bloodInput += input;
+    public int shrinkage() {
+        return this.shrinkage;
     }
 
-    public static void main(String[] args) {
+    public int volemia() {
+        return (int) (this.human.circulatorySystem().volemia() * baseVolemiaRate());
+    }
+
+    public double liftVolemia() {
+        return this.human.circulatorySystem().volemia() * baseVolemiaRate();
+    }
+
+    public void pumpInputMax(int input) {
+        this.pumpInputMax = input;
+    }
+
+    public int pumpInputMax() {
+        return this.pumpInputMax;
     }
 
     public void increaseTension(int shrinkage) {
@@ -128,10 +106,10 @@ public abstract class HumanVascular extends HumanSystem {
             decreaseCompliance(MajalisConfigs.expectedTickTime * 14);
         }
 
-        if (this.bloodInput > 0) {
-            this.bloodInput -= MajalisConfigs.expectedTickTime * 268;
-        } else {
-            this.pumpTicks = 0;
+        if (this.pumpInputMax > 0) {
+            this.pumpInputMax -= MajalisConfigs.expectedTickTime * 268;
         }
     }
+
+    public abstract double baseVolemiaRate();
 }

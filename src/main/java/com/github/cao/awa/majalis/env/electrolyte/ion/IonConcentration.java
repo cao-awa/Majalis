@@ -7,13 +7,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-@Getter
-@Setter
-@AllArgsConstructor
-@Accessors(fluent = true)
-public class IonConcentration {
+public record IonConcentration(Ion ion, MolarMass amount) {
     public static final IonConcentration NOTHING_CONCENTRATION = new IonConcentration(Ion.NOTHING, ConstantMolarMass.ZERO);
-
-    private final Ion ion;
-    private final MolarMass amount;
 }

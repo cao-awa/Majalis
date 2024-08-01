@@ -7,8 +7,13 @@ import com.github.cao.awa.majalis.env.human.system.circulatory.blood.HumanVascul
 public class HumanVeins extends HumanVascular {
     private final Human human;
 
-    public HumanVeins(Human humanBelong, HumanCirculatorySystem circulatorySystem, int initVolemia) {
-        super(initVolemia, 85, 17000);
+    public HumanVeins(Human humanBelong) {
+        super(humanBelong, 85, 17000);
         this.human = humanBelong;
+    }
+
+    @Override
+    public double baseVolemiaRate() {
+        return 0.6;
     }
 }
