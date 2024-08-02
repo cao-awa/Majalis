@@ -6,19 +6,17 @@ import com.github.cao.awa.majalis.env.human.organ.heart.heartbeat.wave.shape.Wav
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import org.jetbrains.annotations.NotNull;
 
 @Getter
 @Setter
-@Accessors(fluent = true)
 public class QWaveMetadata extends WaveMetadata {
-    private WaveRenderShape renderShape = WaveRenderShape.INVERTED;
-
-    @Override
-    public WaveRenderShape renderShape() {
-        return this.renderShape;
+    public QWaveMetadata() {
+        super(WaveRenderShape.INVERTED);
     }
 
     @Override
+    @NotNull
     public WaveType type() {
         return WaveType.Q;
     }

@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id "com.github.ben-manes.versions" version '+'
+    id 'com.github.ben-manes.versions' version '+'
     id 'org.jetbrains.kotlin.jvm' version '2.0.20-RC'
     id 'org.jetbrains.kotlin.plugin.lombok' version '2.0.20-RC'
     id 'io.freefair.lombok' version '8.6'
@@ -56,7 +56,7 @@ dependencies {
 
     shadow 'org.reflections:reflections:0.10.2'
 
-    shadow 'com.github.cao.awa:catheter:1.0.5'
+    shadow 'com.github.cao.awa:catheter:1.0.6'
     shadow 'com.github.cao.awa:sinuatum:1.0.10'
 
     shadow 'org.lz4:lz4-java:1.8.0'
@@ -95,4 +95,8 @@ compileTestKotlin {
     kotlinOptions {
         jvmTarget = '21'
     }
+}
+
+kotlinLombok {
+    lombokConfigurationFile file("lombok.config")
 }

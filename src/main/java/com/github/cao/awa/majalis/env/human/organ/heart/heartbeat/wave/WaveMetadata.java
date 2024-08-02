@@ -1,36 +1,23 @@
 package com.github.cao.awa.majalis.env.human.organ.heart.heartbeat.wave;
 
 import com.github.cao.awa.majalis.env.human.organ.heart.heartbeat.wave.shape.WaveRenderShape;
+import lombok.Getter;
+import lombok.Setter;
+import org.jetbrains.annotations.NotNull;
 
+@Getter
+@Setter
 public abstract class WaveMetadata {
+    @NotNull
+    private final WaveRenderShape renderShape;
     private int peakedTime = 0;
     private int troughTime = 0;
     private int endTime = 0;
 
-    public final void peakedTime(int peekedTime) {
-        this.peakedTime = peekedTime;
+    public WaveMetadata(@NotNull WaveRenderShape renderShape) {
+        this.renderShape = renderShape;
     }
 
-    public final int peakedTime() {
-        return this.peakedTime;
-    }
-
-    public final void troughTime(int troughTime) {
-        this.troughTime = troughTime;
-    }
-
-    public final int troughTime() {
-        return this.troughTime;
-    }
-
-    public final void endTime(int endTime) {
-        this.endTime = endTime;
-    }
-
-    public final int endTime() {
-        return this.endTime;
-    }
-
-    public abstract WaveRenderShape renderShape();
+    @NotNull
     public abstract WaveType type();
 }

@@ -10,6 +10,8 @@ import com.github.cao.awa.majalis.env.human.organ.heart.heartbeat.wave.pr.p.PWav
 import com.github.cao.awa.majalis.env.human.organ.heart.heartbeat.wave.pr.p.PWaveTrigger
 import com.github.cao.awa.majalis.env.human.organ.heart.heartbeat.wave.pr.segmnent.PRSegmentWaveMetadata
 import com.github.cao.awa.majalis.env.human.organ.heart.heartbeat.wave.pr.segmnent.PRSegmentWaveTrigger
+import com.github.cao.awa.majalis.env.human.organ.heart.heartbeat.wave.qt.QTWaveMetadata
+import com.github.cao.awa.majalis.env.human.organ.heart.heartbeat.wave.qt.QTWaveTrigger
 import com.github.cao.awa.majalis.env.human.organ.heart.heartbeat.wave.qt.qrs.QRSWaveMetadata
 import com.github.cao.awa.majalis.env.human.organ.heart.heartbeat.wave.qt.qrs.QRSWaveTrigger
 import com.github.cao.awa.majalis.env.human.organ.heart.heartbeat.wave.qt.qrs.q.QWaveMetadata
@@ -18,6 +20,12 @@ import com.github.cao.awa.majalis.env.human.organ.heart.heartbeat.wave.qt.qrs.r.
 import com.github.cao.awa.majalis.env.human.organ.heart.heartbeat.wave.qt.qrs.r.RWaveTrigger
 import com.github.cao.awa.majalis.env.human.organ.heart.heartbeat.wave.qt.qrs.s.SWaveMetadata
 import com.github.cao.awa.majalis.env.human.organ.heart.heartbeat.wave.qt.qrs.s.SWaveTrigger
+import com.github.cao.awa.majalis.env.human.organ.heart.heartbeat.wave.qt.st.STSegmentWaveMetadata
+import com.github.cao.awa.majalis.env.human.organ.heart.heartbeat.wave.qt.st.STSegmentWaveTrigger
+import com.github.cao.awa.majalis.env.human.organ.heart.heartbeat.wave.qt.t.TWaveMetadata
+import com.github.cao.awa.majalis.env.human.organ.heart.heartbeat.wave.qt.t.TWaveTrigger
+import com.github.cao.awa.majalis.env.human.organ.heart.heartbeat.wave.u.UWaveMetadata
+import com.github.cao.awa.majalis.env.human.organ.heart.heartbeat.wave.u.UWaveTrigger
 import com.github.cao.awa.majalis.env.human.system.circulatory.blood.arteries.HumanArteries
 import com.github.cao.awa.majalis.env.tick.Tickable
 import java.util.function.BiConsumer
@@ -27,42 +35,45 @@ class HeartbeatTrigger(heart: HumanHeart, arteries: HumanArteries) : Tickable {
     private val prWave = PRWaveTrigger()
     private val pWave = PWaveTrigger()
     private val prSegment = PRSegmentWaveTrigger()
+    private val qtWave = QTWaveTrigger()
     private val qrsWave = QRSWaveTrigger(arteries)
     private val qWave = QWaveTrigger()
     private val rWave = RWaveTrigger()
     private val sWave = SWaveTrigger()
+    private val stSegment = STSegmentWaveTrigger()
+    private val tWave = TWaveTrigger()
+    private val uWave = UWaveTrigger()
     private var sinus = true
     private var finished = false
     private var times = 0
 
     init {
-        prMetaProcessor { pr ->
-            pr.troughTime(this.times)
-        }.pMetaProcessor { p ->
-            p.troughTime(this.times)
-        }.prSegmentMetaProcessor { prSegment ->
-            prSegment.troughTime(this.times)
-        }.qrsMetaProcessor { qrs ->
-            qrs.troughTime(this.times)
-        }.qMetaProcessor { q ->
-            q.troughTime(this.times)
-        }.rMetaProcessor { r ->
-            r.troughTime(this.times)
-        }.sMetaProcessor { s ->
-            s.troughTime(this.times)
-        }
+        prMetaProcessor { pr -> pr.troughTime(this.times) }
+            .pMetaProcessor { p -> p.troughTime(this.times) }
+            .prSegmentMetaProcessor { prSegment -> prSegment.troughTime(this.times) }
+            .qtMetaProcessor{ qt -> qt.troughTime(this.times) }
+            .qrsMetaProcessor { qrs -> qrs.troughTime(this.times) }
+            .qMetaProcessor { q -> q.troughTime(this.times) }
+            .rMetaProcessor { r -> r.troughTime(this.times) }
+            .sMetaProcessor { s -> s.troughTime(this.times) }
+            .stMetaProcessor { st -> st.troughTime(this.times) }
+            .tMetaProcessor { t -> t.troughTime(this.times) }
+            .uMetaProcessor { u -> u.troughTime(this.times) }
 
+        // The wave PR does not have forwarded.
         pForward { p, pr -> pr.pMeta(p) }
-
-        prSegmentForward { prSegment, pr -> pr.prSegmentMeta(prSegment) }
-
-        qrsForward(QRSWaveMetadata::prMeta)
-
-        qForward { q, qrs -> qrs.qMeta(q) }
-
-        rForward { r, qrs -> qrs.rMeta(r) }
-
-        sForward { s, qrs -> qrs.sMeta(s) }
+            .prSegmentForward { prSegment, pr -> pr.prSegmentMeta(prSegment) }
+            .qtForward(QTWaveMetadata::prMeta)
+            .qrsForward { qrs, qt ->
+                qt.qrsMeta(qrs)
+                qrs.prMeta(qt.prMeta())
+            }
+            .qForward { q, qrs -> qrs.qMeta(q) }
+            .rForward { r, qrs -> qrs.rMeta(r) }
+            .sForward { s, qrs -> qrs.sMeta(s) }
+            .stForward { st, qt -> qt.stMeta(st) }
+            .tForward { t, qt -> qt.tMeta(t) }
+            .uForward { u, t -> u.tMeta(t) }
     }
 
     fun times(): Int = this.times
@@ -91,31 +102,55 @@ class HeartbeatTrigger(heart: HumanHeart, arteries: HumanArteries) : Tickable {
             this.prSegment.finish(this.times)
         }
 
-        if (this.times in 160..239) {
-            this.qrsWave.forwardFromTrigger(this.prWave)
+        if (this.times in 160..600) {
+            this.qtWave.forwardFromTrigger(this.prWave);
 
-            if (this.times < 180) {
-                this.qWave.forwardFromTrigger(this.qrsWave)
-            } else if (this.times == 180) {
-                this.qWave.finish(this.times)
+            if (this.times in 160..239) {
+                this.qrsWave.forwardFromTrigger(this.qtWave)
+
+                if (this.times < 180) {
+                    this.qWave.forwardFromTrigger(this.qrsWave)
+                } else if (this.times == 180) {
+                    this.qWave.finish(this.times)
+                }
+
+                if (this.times in 180..199) {
+                    this.rWave.forwardFromTrigger(this.qrsWave)
+                } else if (this.times == 200) {
+                    this.rWave.finish(this.times)
+                }
+
+                if (this.times in 200..219) {
+                    this.sWave.forwardFromTrigger(this.qrsWave)
+                } else if (this.times == 220) {
+                    this.sWave.finish(this.times)
+                }
+            } else if (this.times == 240) {
+                this.qrsWave.finish(this.times)
             }
 
-            if (this.times in 180..199) {
-                this.rWave.forwardFromTrigger(this.qrsWave)
-            } else if (this.times == 200) {
-                this.rWave.finish(this.times)
+            if (this.times in 240..349) {
+                this.stSegment.forwardFromTrigger(this.qtWave)
+            } else if (this.times == 350) {
+                this.stSegment.finish(this.times)
             }
 
-            if (this.times in 200..219) {
-                this.sWave.forwardFromTrigger(this.qrsWave)
-            } else if (this.times == 220) {
-                this.sWave.finish(this.times)
+            if (this.times in 350..499) {
+                this.tWave.forwardFromTrigger(this.qtWave)
+            } else if (this.times == 500) {
+                this.tWave.finish(this.times)
             }
-        } else if (this.times == 240) {
-            this.qrsWave.finish(this.times)
+
+            if (this.times in 510..529) {
+
+            } else if (this.times == 530) {
+
+            }
+        } else {
+            this.qtWave.finish(this.times)
         }
 
-        if (this.times >= 240) {
+        if (this.times >= 600) {
             this.finished = true
         } else {
             this.finished = false
@@ -196,6 +231,21 @@ class HeartbeatTrigger(heart: HumanHeart, arteries: HumanArteries) : Tickable {
         return this
     }
 
+    fun qtSubscribe(action: Consumer<QTWaveMetadata>): HeartbeatTrigger {
+        this.qtWave.trigger(action)
+        return this
+    }
+
+    fun qtMetaProcessor(action: WaveMetadataProducer<QTWaveMetadata>): HeartbeatTrigger {
+        this.qtWave.metadataProcessor(action)
+        return this
+    }
+
+    fun qtForward(action: BiConsumer<QTWaveMetadata, PRWaveMetadata>): HeartbeatTrigger {
+        this.qtWave.metadataForwarder(action)
+        return this
+    }
+
     fun qrsSubscribe(action: Consumer<QRSWaveMetadata>): HeartbeatTrigger {
         this.qrsWave.trigger(action)
         return this
@@ -206,7 +256,7 @@ class HeartbeatTrigger(heart: HumanHeart, arteries: HumanArteries) : Tickable {
         return this
     }
 
-    fun qrsForward(action: BiConsumer<QRSWaveMetadata, PRWaveMetadata>): HeartbeatTrigger {
+    fun qrsForward(action: BiConsumer<QRSWaveMetadata, QTWaveMetadata>): HeartbeatTrigger {
         this.qrsWave.metadataForwarder(action)
         return this
     }
@@ -253,6 +303,51 @@ class HeartbeatTrigger(heart: HumanHeart, arteries: HumanArteries) : Tickable {
 
     fun sForward(action: BiConsumer<SWaveMetadata, QRSWaveMetadata>): HeartbeatTrigger {
         this.sWave.metadataForwarder(action)
+        return this
+    }
+
+    fun stSubscribe(action: Consumer<STSegmentWaveMetadata>): HeartbeatTrigger {
+        this.stSegment.trigger(action)
+        return this
+    }
+
+    fun stMetaProcessor(action: WaveMetadataProducer<STSegmentWaveMetadata>): HeartbeatTrigger {
+        this.stSegment.metadataProcessor(action)
+        return this
+    }
+
+    fun stForward(action: BiConsumer<STSegmentWaveMetadata, QTWaveMetadata>): HeartbeatTrigger {
+        this.stSegment.metadataForwarder(action)
+        return this
+    }
+
+    fun tSubscribe(action: Consumer<TWaveMetadata>): HeartbeatTrigger {
+        this.tWave.trigger(action)
+        return this
+    }
+
+    fun tMetaProcessor(action: WaveMetadataProducer<TWaveMetadata>): HeartbeatTrigger {
+        this.tWave.metadataProcessor(action)
+        return this
+    }
+
+    fun tForward(action: BiConsumer<TWaveMetadata, QTWaveMetadata>): HeartbeatTrigger {
+        this.tWave.metadataForwarder(action)
+        return this
+    }
+
+    fun uSubscribe(action: Consumer<UWaveMetadata>): HeartbeatTrigger {
+        this.uWave.trigger(action)
+        return this
+    }
+
+    fun uMetaProcessor(action: WaveMetadataProducer<UWaveMetadata>): HeartbeatTrigger {
+        this.uWave.metadataProcessor(action)
+        return this
+    }
+
+    fun uForward(action: BiConsumer<UWaveMetadata, TWaveMetadata>): HeartbeatTrigger {
+        this.uWave.metadataForwarder(action)
         return this
     }
 }

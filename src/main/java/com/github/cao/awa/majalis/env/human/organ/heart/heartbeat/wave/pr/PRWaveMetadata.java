@@ -7,22 +7,20 @@ import com.github.cao.awa.majalis.env.human.organ.heart.heartbeat.wave.pr.segmne
 import com.github.cao.awa.majalis.env.human.organ.heart.heartbeat.wave.shape.WaveRenderShape;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.experimental.Accessors;
+import org.jetbrains.annotations.NotNull;
 
 @Getter
 @Setter
-@Accessors(fluent = true)
 public class PRWaveMetadata extends WaveMetadata {
     private PWaveMetadata pMeta;
     private PRSegmentWaveMetadata prSegmentMeta;
-    private WaveRenderShape renderShape = WaveRenderShape.COMPLEX;
 
-    @Override
-    public WaveRenderShape renderShape() {
-        return this.renderShape;
+    public PRWaveMetadata() {
+        super(WaveRenderShape.COMPLEX);
     }
 
     @Override
+    @NotNull
     public WaveType type() {
         return WaveType.PR_INTERVAL;
     }

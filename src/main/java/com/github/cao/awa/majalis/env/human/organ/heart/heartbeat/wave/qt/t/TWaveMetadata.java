@@ -1,4 +1,4 @@
-package com.github.cao.awa.majalis.env.human.organ.heart.heartbeat.wave.qt.qrs.s;
+package com.github.cao.awa.majalis.env.human.organ.heart.heartbeat.wave.qt.t;
 
 import com.github.cao.awa.majalis.env.human.organ.heart.heartbeat.wave.WaveMetadata;
 import com.github.cao.awa.majalis.env.human.organ.heart.heartbeat.wave.WaveType;
@@ -10,14 +10,14 @@ import org.jetbrains.annotations.NotNull;
 
 @Getter
 @Setter
-public class SWaveMetadata extends WaveMetadata {
-    public SWaveMetadata() {
-        super(WaveRenderShape.INVERTED);
+public class TWaveMetadata extends WaveMetadata {
+    public TWaveMetadata() {
+        super(WaveRenderShape.SMOOTHED);
     }
 
     @Override
     @NotNull
     public WaveType type() {
-        return WaveType.S;
+        return WaveType.P;
     }
 }

@@ -6,19 +6,17 @@ import com.github.cao.awa.majalis.env.human.organ.heart.heartbeat.wave.shape.Wav
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import org.jetbrains.annotations.NotNull;
 
 @Getter
 @Setter
-@Accessors(fluent = true)
 public class RWaveMetadata extends WaveMetadata {
-    private WaveRenderShape renderShape = WaveRenderShape.PEAKED;
-
-    @Override
-    public WaveRenderShape renderShape() {
-        return this.renderShape;
+    public RWaveMetadata() {
+        super(WaveRenderShape.PEAKED);
     }
 
     @Override
+    @NotNull
     public WaveType type() {
         return WaveType.R;
     }

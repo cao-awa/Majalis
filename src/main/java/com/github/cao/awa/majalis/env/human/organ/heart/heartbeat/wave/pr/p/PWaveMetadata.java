@@ -5,20 +5,17 @@ import com.github.cao.awa.majalis.env.human.organ.heart.heartbeat.wave.WaveType;
 import com.github.cao.awa.majalis.env.human.organ.heart.heartbeat.wave.shape.WaveRenderShape;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.experimental.Accessors;
+import org.jetbrains.annotations.NotNull;
 
 @Getter
 @Setter
-@Accessors(fluent = true)
 public class PWaveMetadata extends WaveMetadata {
-    private WaveRenderShape renderShape = WaveRenderShape.SMOOTHED;
-
-    @Override
-    public WaveRenderShape renderShape() {
-        return this.renderShape;
+    public PWaveMetadata() {
+        super(WaveRenderShape.SMOOTHED);
     }
 
     @Override
+    @NotNull
     public WaveType type() {
         return WaveType.P;
     }

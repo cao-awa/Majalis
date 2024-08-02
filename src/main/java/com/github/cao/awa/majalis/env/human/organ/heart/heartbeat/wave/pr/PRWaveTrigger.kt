@@ -1,14 +1,11 @@
-package com.github.cao.awa.majalis.env.human.organ.heart.heartbeat.wave.pr;
+package com.github.cao.awa.majalis.env.human.organ.heart.heartbeat.wave.pr
 
-import com.github.cao.awa.majalis.env.human.organ.heart.heartbeat.wave.WaveMetadata;
-import com.github.cao.awa.majalis.env.human.organ.heart.heartbeat.wave.WaveTrigger;
+import com.github.cao.awa.majalis.env.human.organ.heart.heartbeat.wave.WaveMetadata
+import com.github.cao.awa.majalis.env.human.organ.heart.heartbeat.wave.WaveTrigger
 
 /**
- * The trigger that engine the heartbeat wave P.
+ * The trigger that engine the heartbeat wave PR.
  */
-public class PRWaveTrigger extends WaveTrigger<PRWaveMetadata, WaveMetadata> {
-    @Override
-    public PRWaveMetadata primeMetadata() {
-        return new PRWaveMetadata();
-    }
+class PRWaveTrigger : WaveTrigger<PRWaveMetadata, WaveMetadata>() {
+    override fun primeMetadata(): PRWaveMetadata = PRWaveMetadata()
 }
