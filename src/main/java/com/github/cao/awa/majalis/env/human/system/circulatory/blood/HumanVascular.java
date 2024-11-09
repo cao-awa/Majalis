@@ -15,6 +15,7 @@ public abstract class HumanVascular extends HumanSystem {
     private int shrinkage;
     // Vascular elasticity or vascular compliance, unit is μL/mmHg.
     private int elasticity;
+    private int refluxPressure = 1000;
 
     public HumanVascular(Human human, int expectedShrinkage, int expectedElasticity) {
         this.human = human;
@@ -92,6 +93,10 @@ public abstract class HumanVascular extends HumanSystem {
         return this;
     }
 
+    public void refluxPressure(int refluxPressure) {
+        this.refluxPressure = refluxPressure;
+    }
+
     @Override
     public void tick() {
         if (this.shrinkage > this.expectedShrinkage) {
@@ -107,7 +112,7 @@ public abstract class HumanVascular extends HumanSystem {
         }
 
         if (this.pumpInputMax > 0) {
-            this.pumpInputMax -= MajalisConfigs.expectedTickTime * 268;
+            this.pumpInputMax -= MajalisConfigs.expectedTickTime * 268 * (1000 / this.refluxPressure);
         }
     }
 

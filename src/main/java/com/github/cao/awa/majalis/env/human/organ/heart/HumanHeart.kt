@@ -1,91 +1,89 @@
-package com.github.cao.awa.majalis.env.human.organ.heart;
+package com.github.cao.awa.majalis.env.human.organ.heart
 
-import com.github.cao.awa.majalis.env.human.Human;
-import com.github.cao.awa.majalis.env.human.organ.heart.heartbeat.HeartbeatTrigger;
-import com.github.cao.awa.majalis.env.human.organ.heart.heartbeat.wave.WaveMetadata;
-import com.github.cao.awa.majalis.env.human.organ.heart.heartbeat.wave.qt.qrs.QRSWaveMetadata;
-import com.github.cao.awa.majalis.env.human.system.circulatory.blood.arteries.HumanArteries;
-import com.github.cao.awa.majalis.env.human.organ.HumanOrgan;
-import com.github.cao.awa.majalis.env.human.system.circulatory.blood.veins.HumanVeins;
+import com.github.cao.awa.majalis.env.human.Human
+import com.github.cao.awa.majalis.env.human.organ.HumanOrgan
+import com.github.cao.awa.majalis.env.human.organ.heart.heartbeat.HeartbeatTrigger
+import com.github.cao.awa.majalis.env.human.organ.heart.heartbeat.wave.WaveMetadata
+import com.github.cao.awa.majalis.env.human.organ.heart.heartbeat.wave.pr.p.PWaveMetadata
+import com.github.cao.awa.majalis.env.human.organ.heart.heartbeat.wave.qt.QTWaveMetadata
+import com.github.cao.awa.majalis.env.human.organ.heart.heartbeat.wave.qt.qrs.QRSWaveMetadata
+import com.github.cao.awa.majalis.env.human.organ.heart.heartbeat.wave.qt.qrs.q.QWaveMetadata
+import com.github.cao.awa.majalis.env.human.system.circulatory.blood.arteries.HumanArteries
+import com.github.cao.awa.majalis.env.human.system.circulatory.blood.veins.HumanVeins
 
-public class HumanHeart extends HumanOrgan {
-    private final Human human;
-    private final HeartbeatTrigger trigger;
-    private final HumanArteries arteries;
-    private final HumanVeins veins;
-    private WaveMetadata state;
-    private WaveMetadata subState;
-    private int pumpInRightAtria;
-    private int pumpInRightVentricle;
-    private int pumpInLeftAtria;
-    private int pumpInLeftVentricle;
+class HumanHeart(private val human: Human, private val arteries: HumanArteries, private val veins: HumanVeins) : HumanOrgan() {
+    private val trigger = HeartbeatTrigger(this, this.arteries)
+    private val state: WaveMetadata? = null
+    private var subState: WaveMetadata? = null
+    private val pumpInRightAtria = 0
+    private val pumpInRightVentricle = 0
+    private val pumpInLeftAtria = 0
+    private val pumpInLeftVentricle = 0
 
-    public HumanHeart(Human humanBelong, HumanArteries arteries, HumanVeins veins) {
-        this.human = humanBelong;
-        this.arteries = arteries;
-        this.veins = veins;
-        this.trigger = new HeartbeatTrigger(this, this.arteries);
-
-        initHeartSubscribers();
+    init {
+        initHeartSubscribers()
     }
 
-    private void initHeartSubscribers() {
-        this.trigger.pMetaProcessor(p -> {
+    private fun initHeartSubscribers() {
+        this.trigger.pMetaProcessor { p ->
 
-        }).pSubscribe(p -> {
+        }.pSubscribe { p ->
 
-        }).qrsMetaProcessor(qrs -> {
-            qrs.backlogOutput(this.arteries.pumpInputMax());
-            qrs.peakedOutput(90000);
-            this.state = qrs;
-            this.arteries.pumpInputMax(qrs.peakedOutput());
-        }).qrsForward((qrs, p) -> {
-            qrs.peakedTime(p.endTime() + 60);
-        }).qrsSubscribe(qrs -> {
+        }.qrsMetaProcessor { qrs ->
+            qrs.backlogOutput = this.arteries.pumpInputMax()
+            qrs.peakedOutput = 90000
+            this.subState = qrs
+            this.arteries.pumpInputMax(qrs.peakedOutput)
+        }.qrsForward { qrs, qt ->
+            qrs.peakedTime = qt.endTime + 60
+        }.qrsSubscribe { qrs ->
 
-        }).qMetaProcessor(q -> {
+        }.qMetaProcessor { q ->
 
-        }).qForward((q, qrs) -> {
+        }.qForward { q, qrs ->
 
-        }).qSubscribe(q -> {
-            this.subState = q;
-        });
-    }
-
-    @Override
-    public void tick() {
-        tickBlood();
-
-        if (this.state != null && this.state instanceof QRSWaveMetadata qrs) {
-            System.out.println(this.arteries.bloodPressure(this.trigger.times(), qrs));
-        } else {
-            System.out.println(this.arteries.bloodPressure(-1, null));
+        }.qSubscribe { q ->
+            this.subState = q
         }
     }
 
-    @Override
-    public void tickBlood() {
-        this.trigger.finished(HeartbeatTrigger::resetHeartbeat);
+    override fun tick() {
+        tickBlood()
 
-        this.trigger.tick();
-
-        this.arteries.tick();
-
-        this.veins.tick();
+        if (this.subState != null && this.subState is QRSWaveMetadata) {
+            println(this.arteries.bloodPressure(this.trigger.times(), this.subState as QRSWaveMetadata))
+        } else {
+            println(this.arteries.bloodPressure(-1, null))
+        }
     }
 
-    @Override
-    public Human human() {
-        return this.human;
+    override fun tickBlood() {
+        tickBloodPump()
+        tickBloodCell()
     }
 
-    @Override
-    public HumanArteries arteries() {
-        return this.arteries;
+    private fun tickBloodPump() {
+        this.trigger.finished { trigger -> trigger.resetHeartbeat() }
+
+        this.trigger.tick()
+
+        this.arteries.tick()
+
+        this.veins.tick()
     }
 
-    @Override
-    public HumanVeins veins() {
-        return this.veins;
+    private fun tickBloodCell() {
+    }
+
+    override fun human(): Human {
+        return this.human
+    }
+
+    override fun arteries(): HumanArteries {
+        return this.arteries
+    }
+
+    override fun veins(): HumanVeins {
+        return this.veins
     }
 }

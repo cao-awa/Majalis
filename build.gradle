@@ -2,8 +2,6 @@ plugins {
     id 'java'
     id 'com.github.ben-manes.versions' version '+'
     id 'org.jetbrains.kotlin.jvm' version '2.0.20-RC'
-    id 'org.jetbrains.kotlin.plugin.lombok' version '2.0.20-RC'
-    id 'io.freefair.lombok' version '8.6'
 }
 
 group = 'com.github.cao.awa'
@@ -16,7 +14,7 @@ repositories {
         url = "https://maven.pkg.github.com/cao-awa/Catheter"
         credentials {
             username = "cao-awa"
-            password = "ghp_8yGFQIhfc0wz43ws" + "Orpdne0yOkzhN20XimQl"
+            password = "ghp_UgALm1Ta2ONYeNh" + "S2m0XoWSc27BcE22v4Umn"
         }
     }
     maven {
@@ -24,7 +22,7 @@ repositories {
         url = "https://maven.pkg.github.com/cao-awa/Sinuatum"
         credentials {
             username = "cao-awa"
-            password = "ghp_8yGFQIhfc0wz43ws" + "Orpdne0yOkzhN20XimQl"
+            password = "ghp_UgALm1Ta2ONYeNh" + "S2m0XoWSc27BcE22v4Umn"
         }
     }
 }
@@ -37,9 +35,6 @@ configurations {
 dependencies {
     testImplementation platform('org.junit:junit-bom:5.9.1')
     testImplementation 'org.junit.jupiter:junit-jupiter'
-
-    compileOnly 'org.projectlombok:lombok:1.18.34'
-    annotationProcessor 'org.projectlombok:lombok:1.18.34'
 
     shadow 'org.slf4j:slf4j-api:2.1.0-alpha1'
     shadow 'org.apache.logging.log4j:log4j-slf4j2-impl:2.23.1'
@@ -56,8 +51,8 @@ dependencies {
 
     shadow 'org.reflections:reflections:0.10.2'
 
-    shadow 'com.github.cao.awa:catheter:1.0.6'
-    shadow 'com.github.cao.awa:sinuatum:1.0.10'
+    shadow 'com.github.cao.awa:catheter:1.0.42'
+    shadow 'com.github.cao.awa:sinuatum:1.0.11'
 
     shadow 'org.lz4:lz4-java:1.8.0'
 }
@@ -95,8 +90,4 @@ compileTestKotlin {
     kotlinOptions {
         jvmTarget = '21'
     }
-}
-
-kotlinLombok {
-    lombokConfigurationFile file("lombok.config")
 }

@@ -5,7 +5,6 @@ import com.github.cao.awa.majalis.env.human.organ.heart.HumanHeart;
 import com.github.cao.awa.majalis.env.human.system.HumanSystem;
 import com.github.cao.awa.majalis.env.human.system.circulatory.blood.SystemBlood;
 import com.github.cao.awa.majalis.env.human.system.circulatory.blood.arteries.HumanArteries;
-import com.github.cao.awa.majalis.env.human.system.circulatory.blood.cell.BloodCell;
 import com.github.cao.awa.majalis.env.human.system.circulatory.blood.cell.BloodCellConcentration;
 import com.github.cao.awa.majalis.env.human.system.circulatory.blood.cell.SystemBloodCell;
 import com.github.cao.awa.majalis.env.human.system.circulatory.blood.cell.locate.BloodCellLocate;

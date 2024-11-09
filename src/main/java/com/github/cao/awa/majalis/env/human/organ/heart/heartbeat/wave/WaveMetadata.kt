@@ -1,23 +1,11 @@
-package com.github.cao.awa.majalis.env.human.organ.heart.heartbeat.wave;
+package com.github.cao.awa.majalis.env.human.organ.heart.heartbeat.wave
 
-import com.github.cao.awa.majalis.env.human.organ.heart.heartbeat.wave.shape.WaveRenderShape;
-import lombok.Getter;
-import lombok.Setter;
-import org.jetbrains.annotations.NotNull;
+import com.github.cao.awa.majalis.env.human.organ.heart.heartbeat.wave.shape.WaveRenderShape
 
-@Getter
-@Setter
-public abstract class WaveMetadata {
-    @NotNull
-    private final WaveRenderShape renderShape;
-    private int peakedTime = 0;
-    private int troughTime = 0;
-    private int endTime = 0;
+abstract class WaveMetadata(val renderShape: WaveRenderShape) {
+    var peakedTime = 0
+    var troughTime = 0
+    var endTime = 0
 
-    public WaveMetadata(@NotNull WaveRenderShape renderShape) {
-        this.renderShape = renderShape;
-    }
-
-    @NotNull
-    public abstract WaveType type();
+    abstract fun type(): WaveType
 }

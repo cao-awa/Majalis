@@ -30,13 +30,13 @@ public class HumanArteries extends HumanVascular {
      * @return The blood pressure united by mmHg
      */
     public int bloodPressure(int timed, @Nullable QRSWaveMetadata qrs) {
-        // Compliance also known as ’C’ unit is mL.
+        // Compliance also known as 'C' unit is mL.
         double compliance = elasticity() / 1000D;
-        // Resistant also known as ’R’ unit is mL.
+        // Resistant also known as 'R' unit is mL.
         double resistant = shrinkage() / 1000D;
-        // Input also known as ’CO’ unit is mL.
+        // Input also known as 'CO' unit is mL.
         double input = (qrs == null ? pumpInputMax() : qrs.calculateCurrentOutput(timed)) / 1000D;
-        // Volemia also known as ’V’ unit is mL.
+        // Volemia also known as 'V' unit is mL.
         double volemia = volemia();
         double offset = 1 - Math.exp(- (resistant * compliance));
         double volemiaOffset =  (1 - Math.exp(-resistant));

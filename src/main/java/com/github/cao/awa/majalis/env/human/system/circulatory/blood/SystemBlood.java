@@ -1,8 +1,6 @@
 package com.github.cao.awa.majalis.env.human.system.circulatory.blood;
 
 import com.github.cao.awa.majalis.env.human.Human;
-import com.github.cao.awa.majalis.env.human.system.circulatory.HumanCirculatorySystem;
-import com.github.cao.awa.majalis.env.human.system.circulatory.blood.cell.SystemBloodCell;
 
 public class SystemBlood {
     private final Human human;

@@ -48,32 +48,32 @@ class HeartbeatTrigger(heart: HumanHeart, arteries: HumanArteries) : Tickable {
     private var times = 0
 
     init {
-        prMetaProcessor { pr -> pr.troughTime(this.times) }
-            .pMetaProcessor { p -> p.troughTime(this.times) }
-            .prSegmentMetaProcessor { prSegment -> prSegment.troughTime(this.times) }
-            .qtMetaProcessor{ qt -> qt.troughTime(this.times) }
-            .qrsMetaProcessor { qrs -> qrs.troughTime(this.times) }
-            .qMetaProcessor { q -> q.troughTime(this.times) }
-            .rMetaProcessor { r -> r.troughTime(this.times) }
-            .sMetaProcessor { s -> s.troughTime(this.times) }
-            .stMetaProcessor { st -> st.troughTime(this.times) }
-            .tMetaProcessor { t -> t.troughTime(this.times) }
-            .uMetaProcessor { u -> u.troughTime(this.times) }
+        prMetaProcessor { pr -> pr.troughTime = this.times }
+            .pMetaProcessor { p -> p.troughTime = this.times }
+            .prSegmentMetaProcessor { prSegment -> prSegment.troughTime = this.times }
+            .qtMetaProcessor{ qt -> qt.troughTime = this.times }
+            .qrsMetaProcessor { qrs -> qrs.troughTime = this.times }
+            .qMetaProcessor { q -> q.troughTime = this.times }
+            .rMetaProcessor { r -> r.troughTime = this.times }
+            .sMetaProcessor { s -> s.troughTime = this.times }
+            .stMetaProcessor { st -> st.troughTime = this.times }
+            .tMetaProcessor { t -> t.troughTime = this.times }
+            .uMetaProcessor { u -> u.troughTime = this.times }
 
         // The wave PR does not have forwarded.
-        pForward { p, pr -> pr.pMeta(p) }
-            .prSegmentForward { prSegment, pr -> pr.prSegmentMeta(prSegment) }
-            .qtForward(QTWaveMetadata::prMeta)
+        pForward { p, pr -> pr.pMeta = p }
+            .prSegmentForward { prSegment, pr -> pr.prSegmentMeta= prSegment }
+            .qtForward { qt, pr -> qt.prMeta = pr }
             .qrsForward { qrs, qt ->
-                qt.qrsMeta(qrs)
-                qrs.prMeta(qt.prMeta())
+                qt.qrsMeta = qrs
+                qrs.prMeta = qt.prMeta
             }
-            .qForward { q, qrs -> qrs.qMeta(q) }
-            .rForward { r, qrs -> qrs.rMeta(r) }
-            .sForward { s, qrs -> qrs.sMeta(s) }
-            .stForward { st, qt -> qt.stMeta(st) }
-            .tForward { t, qt -> qt.tMeta(t) }
-            .uForward { u, t -> u.tMeta(t) }
+            .qForward { q, qrs -> qrs.qMeta = q }
+            .rForward { r, qrs -> qrs.rMeta = r }
+            .sForward { s, qrs -> qrs.sMeta = s }
+            .stForward { st, qt -> qt.stMeta = st }
+            .tForward { t, qt -> qt.tMeta = t }
+            .uForward { u, t -> u.tMeta = t }
     }
 
     fun times(): Int = this.times
@@ -186,8 +186,10 @@ class HeartbeatTrigger(heart: HumanHeart, arteries: HumanArteries) : Tickable {
 
     fun sinus(): Boolean = this.sinus
 
-    fun prSubscribe(action: Consumer<PRWaveMetadata>): HeartbeatTrigger {
-        this.prWave.trigger(action)
+    fun prSubscribe(action: Consumer<PRWaveMetadata>): HeartbeatTrigger = prSubscribe(action) { }
+
+    fun prSubscribe(action: Consumer<PRWaveMetadata>, finishing: Consumer<PRWaveMetadata>): HeartbeatTrigger {
+        this.prWave.trigger(action, finishing)
         return this
     }
 
@@ -201,8 +203,10 @@ class HeartbeatTrigger(heart: HumanHeart, arteries: HumanArteries) : Tickable {
         return this
     }
 
-    fun prSegmentSubscribe(action: Consumer<PRSegmentWaveMetadata>): HeartbeatTrigger {
-        this.prSegment.trigger(action)
+    fun prSegmentSubscribe(action: Consumer<PRSegmentWaveMetadata>): HeartbeatTrigger = prSegmentSubscribe(action) { }
+
+    fun prSegmentSubscribe(action: Consumer<PRSegmentWaveMetadata>, finishing: Consumer<PRSegmentWaveMetadata>): HeartbeatTrigger {
+        this.prSegment.trigger(action, finishing)
         return this
     }
 
@@ -216,8 +220,10 @@ class HeartbeatTrigger(heart: HumanHeart, arteries: HumanArteries) : Tickable {
         return this
     }
 
-    fun pSubscribe(action: Consumer<PWaveMetadata>): HeartbeatTrigger {
-        this.pWave.trigger(action)
+    fun pSubscribe(action: Consumer<PWaveMetadata>): HeartbeatTrigger = pSubscribe(action) { }
+
+    fun pSubscribe(action: Consumer<PWaveMetadata>, finishing: Consumer<PWaveMetadata>): HeartbeatTrigger {
+        this.pWave.trigger(action, finishing)
         return this
     }
 
@@ -231,8 +237,10 @@ class HeartbeatTrigger(heart: HumanHeart, arteries: HumanArteries) : Tickable {
         return this
     }
 
-    fun qtSubscribe(action: Consumer<QTWaveMetadata>): HeartbeatTrigger {
-        this.qtWave.trigger(action)
+    fun qtSubscribe(action: Consumer<QTWaveMetadata>): HeartbeatTrigger = qtSubscribe(action) { }
+
+    fun qtSubscribe(action: Consumer<QTWaveMetadata>, finishing: Consumer<QTWaveMetadata>): HeartbeatTrigger {
+        this.qtWave.trigger(action, finishing)
         return this
     }
 
@@ -246,8 +254,10 @@ class HeartbeatTrigger(heart: HumanHeart, arteries: HumanArteries) : Tickable {
         return this
     }
 
-    fun qrsSubscribe(action: Consumer<QRSWaveMetadata>): HeartbeatTrigger {
-        this.qrsWave.trigger(action)
+    fun qrsSubscribe(action: Consumer<QRSWaveMetadata>): HeartbeatTrigger = qrsSubscribe(action) { }
+
+    fun qrsSubscribe(action: Consumer<QRSWaveMetadata>, finishing: Consumer<QRSWaveMetadata>): HeartbeatTrigger {
+        this.qrsWave.trigger(action, finishing)
         return this
     }
 
@@ -261,8 +271,10 @@ class HeartbeatTrigger(heart: HumanHeart, arteries: HumanArteries) : Tickable {
         return this
     }
 
-    fun qSubscribe(action: Consumer<QWaveMetadata>): HeartbeatTrigger {
-        this.qWave.trigger(action)
+    fun qSubscribe(action: Consumer<QWaveMetadata>): HeartbeatTrigger = qSubscribe(action) { }
+
+    fun qSubscribe(action: Consumer<QWaveMetadata>, finishing: Consumer<QWaveMetadata>): HeartbeatTrigger {
+        this.qWave.trigger(action, finishing)
         return this
     }
 
@@ -276,8 +288,10 @@ class HeartbeatTrigger(heart: HumanHeart, arteries: HumanArteries) : Tickable {
         return this
     }
 
-    fun rSubscribe(action: Consumer<RWaveMetadata>): HeartbeatTrigger {
-        this.rWave.trigger(action)
+    fun rSubscribe(action: Consumer<RWaveMetadata>): HeartbeatTrigger = rSubscribe(action) { }
+
+    fun rSubscribe(action: Consumer<RWaveMetadata>, finishing: Consumer<RWaveMetadata>): HeartbeatTrigger {
+        this.rWave.trigger(action, finishing)
         return this
     }
 
@@ -291,8 +305,10 @@ class HeartbeatTrigger(heart: HumanHeart, arteries: HumanArteries) : Tickable {
         return this
     }
 
-    fun sSubscribe(action: Consumer<SWaveMetadata>): HeartbeatTrigger {
-        this.sWave.trigger(action)
+    fun sSubscribe(action: Consumer<SWaveMetadata>): HeartbeatTrigger = sSubscribe(action) { }
+
+    fun sSubscribe(action: Consumer<SWaveMetadata>, finishing: Consumer<SWaveMetadata>): HeartbeatTrigger {
+        this.sWave.trigger(action, finishing)
         return this
     }
 
@@ -306,8 +322,10 @@ class HeartbeatTrigger(heart: HumanHeart, arteries: HumanArteries) : Tickable {
         return this
     }
 
-    fun stSubscribe(action: Consumer<STSegmentWaveMetadata>): HeartbeatTrigger {
-        this.stSegment.trigger(action)
+    fun stSubscribe(action: Consumer<STSegmentWaveMetadata>): HeartbeatTrigger = stSubscribe(action) { }
+
+    fun stSubscribe(action: Consumer<STSegmentWaveMetadata>, finishing: Consumer<STSegmentWaveMetadata>): HeartbeatTrigger {
+        this.stSegment.trigger(action, finishing)
         return this
     }
 
@@ -321,8 +339,10 @@ class HeartbeatTrigger(heart: HumanHeart, arteries: HumanArteries) : Tickable {
         return this
     }
 
-    fun tSubscribe(action: Consumer<TWaveMetadata>): HeartbeatTrigger {
-        this.tWave.trigger(action)
+    fun tSubscribe(action: Consumer<TWaveMetadata>): HeartbeatTrigger = tSubscribe(action) { }
+
+    fun tSubscribe(action: Consumer<TWaveMetadata>, finishing: Consumer<TWaveMetadata>): HeartbeatTrigger {
+        this.tWave.trigger(action, finishing)
         return this
     }
 
@@ -336,8 +356,10 @@ class HeartbeatTrigger(heart: HumanHeart, arteries: HumanArteries) : Tickable {
         return this
     }
 
-    fun uSubscribe(action: Consumer<UWaveMetadata>): HeartbeatTrigger {
-        this.uWave.trigger(action)
+    fun uSubscribe(action: Consumer<UWaveMetadata>): HeartbeatTrigger = uSubscribe(action) { }
+
+    fun uSubscribe(action: Consumer<UWaveMetadata>, finishing: Consumer<UWaveMetadata>): HeartbeatTrigger {
+        this.uWave.trigger(action, finishing)
         return this
     }
 

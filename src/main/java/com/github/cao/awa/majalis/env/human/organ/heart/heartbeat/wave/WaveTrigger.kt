@@ -5,6 +5,8 @@ import com.github.cao.awa.majalis.env.human.organ.heart.heartbeat.wave.pipeline.
 import com.github.cao.awa.majalis.env.human.organ.heart.heartbeat.wave.pipeline.WaveMetadataProducer
 import com.github.cao.awa.majalis.env.human.organ.heart.heartbeat.wave.shape.WaveRenderShape
 import com.github.cao.awa.sinuatum.manipulate.Manipulate
+import com.github.cao.awa.sinuatum.manipulate.ManipulateBuilder
+import com.github.cao.awa.sinuatum.manipulate.QuickManipulate
 import java.util.function.BiConsumer
 import java.util.function.Consumer
 
@@ -12,11 +14,13 @@ abstract class WaveTrigger<M : WaveMetadata, L : WaveMetadata> {
     private lateinit var metadata: M
     private var finished = true
     private val triggers: MutableList<Consumer<M>> = ApricotCollectionFactor.linkedList()
+    private val finishingTriggers: MutableList<Consumer<M>> = ApricotCollectionFactor.linkedList()
     private val forwarders: MutableList<BiConsumer<M, L>> = ApricotCollectionFactor.linkedList()
     private val pipeline = WaveMetadataPipeline<M>()
 
-    fun trigger(trigger: Consumer<M>): WaveTrigger<M, L> {
+    fun trigger(trigger: Consumer<M>, finishingTrigger: Consumer<M>): WaveTrigger<M, L> {
         this.triggers.add(trigger)
+        this.finishingTriggers.add(finishingTrigger)
         return this
     }
 
@@ -60,11 +64,15 @@ abstract class WaveTrigger<M : WaveMetadata, L : WaveMetadata> {
             return
         }
         this.finished = true
-        this.metadata.endTime(finishTime)
+        this.metadata.endTime = finishTime
+
+        for (trigger in this.finishingTriggers) {
+            trigger.accept(this.metadata)
+        }
     }
 
     fun renderShape(): WaveRenderShape {
-        return Manipulate.supplyWhenNotNull(WaveMetadata::renderShape).operateOrDefault(
+        return ManipulateBuilder.supplyWhenNotNull(WaveMetadata::renderShape).operateOrDefault(
             metadata(),
             WaveRenderShape.ABSENT
         )
